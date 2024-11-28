@@ -58,7 +58,7 @@ def create_todo(todo:TodoCreate,db:Session=Depends(get_db)):
        return db_todo
 @app.get("/todos",response_model=list[TodoResponse])
 def read_todos(db:Session=Depends(get_db)):
-       return dp.query(Todo).all()
+       return db.query(Todo).all()
 @app.get("/todo{todo_id}",response_model=TodoResponse)
 def read_todos(todo_id:int, db:Session=Depends(get_db)):
        db_todo=db.query(Todo).filter(Todo.id==todo_id).first()
