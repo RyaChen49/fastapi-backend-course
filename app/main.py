@@ -12,12 +12,12 @@ DATABASE
 #Database
 DATABASE_URL="sqlite:///./todos.db"
 Base=declarative_base()
-engine=create_engine(DATABASE_URL,connect_arg=("check_same_thread":False))
+engine=create_engine(DATABASE_URL,connect_args={"check_same_thread":False})
 Sessionlocal=sessionmaker(autocommit=False,autoflush=False,bind=engine)
 #Define Model
 class Todo(Base):
         __tablename__="todos"
-        id=Column(Integer,primary_key=True,Index=True)
+        id=Column(Integer,primary_key=True)
         title=Column(String,nullable=False)
         description=Column(String,nullable=False)
         completed=Column(Boolean,default=False)
@@ -50,33 +50,33 @@ def get_db():
 ROUTING
 '''
 @app.post("/todos",response_model=TodoResponse)
-def create_todo(todo:TodoCreate,db:Session=Depends(get_db))
+def create_todo(todo:TodoCreate,db:Session=Depends(get_db)):
        db_todo=Todo(**todo.dict())
        db.add(db_todo)
        db.commit()
        db.refresh(db_todo)
        return db_todo
 @app.get("/todos",response_model=list[TodoResponse])
-def read_todos(db:Session=Depends(get_db())):
+def read_todos(db:Session=Depends(get_db)):
        return dp.query(Todo).all()
 @app.get("/todo{todo_id}",response_model=TodoResponse)
-def read_todos(todo_id:int, db:Session=Depends(get_db())):
+def read_todos(todo_id:int, db:Session=Depends(get_db)):
        db_todo=db.query(Todo).filter(Todo.id==todo_id).first()
        if not db_todo:
             return HTTPException(status_code=404,details="Todo not found")
        return db_todo
 @app.put("/todo{todo_id}",response_model=TodoResponse)
-def updata_todo(todo_id:int,todo:TodoCreate, db:Session=Depends(get_db())):
+def updata_todo(todo_id:int,todo:TodoCreate, db:Session=Depends(get_db)):
     db_todo=db.query(Todo).filter(Todo.id==todo_id).first()
     if not db_todo:
         return HTTPException(status_code=404,details="Todo not found")
-    for key,value in todo.dict().items()
+    for key,value in todo.dict().items():
         setattr(db_todo,key,value)
     db.commit()
     db.refresh(db_todo)
     return db_todo
 @app.delete("/todo{todo_id}")
-def delete_todo(todo_id:int,todo:TodoCreate, db:Session=Depends(get_db())):
+def delete_todo(todo_id:int,todo:TodoCreate, db:Session=Depends(get_db)):
     db_todo=db.query(Todo).filter(Todo.id==todo_id).first()
     if not db_todo:
         return HTTPException(status_code=404,details="Todo not found")
