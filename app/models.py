@@ -11,7 +11,7 @@ class Todo(Base):
 
 class Users(Base):
         __tablename__="Users"
-        id=Column(Integer, primary_key=True, index=True)
+        iiiid=Column(Integer, primary_key=True, index=True)
         username=Column(String,nullable=False)
         password=Column(String,nullable=False)
         email = Column(String, unique=True, nullable=False)
